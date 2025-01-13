@@ -1,9 +1,14 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using SistemaCorteDeCaja;
+using SistemaCorteDeCaja.Auth.Services;
 using SistemaCorteDeCaja.Models;
 using SistemaCorteDeCaja.Roles.Services;
+using SistemaCorteDeCaja.Shared.Settings;
 using SistemaCorteDeCaja.Users.Services;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,9 +18,44 @@ builder.Services.AddDbContext<CorteDeCajaContext>(op => op
 .EnableSensitiveDataLogging(false) // Deshabilita información sensible
 );
 
+
+
+// Autehntication
+IConfiguration jwtSettings = builder.Configuration.GetSection("JWT");
+
+if (jwtSettings == null)
+{
+    throw new Exception("JWT settings not found");
+}
+
+var secret = jwtSettings.GetValue<string>("SecretKey");
+
+if (string.IsNullOrEmpty(secret))
+{
+    throw new Exception("JWT settings not found");
+}
+
+
+builder.Services.Configure<JwtSettings>(jwtSettings);
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret))
+        };
+    });
+
+
 //Services
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<RoleService>();
+builder.Services.AddScoped<AuthService>();
 
 // Add services to the container.
 builder.Services.AddControllers(options =>
