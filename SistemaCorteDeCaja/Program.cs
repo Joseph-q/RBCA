@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using SistemaCorteDeCaja;
 using SistemaCorteDeCaja.Auth.Services;
 using SistemaCorteDeCaja.Models;
@@ -14,29 +15,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 //Database
 builder.Services.AddDbContext<CorteDeCajaContext>(op => op
-.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-.EnableSensitiveDataLogging(false) // Deshabilita información sensible
-);
-
+    .UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+    .EnableSensitiveDataLogging(builder.Environment.IsDevelopment()));
 
 
 // Autehntication
-IConfiguration jwtSettings = builder.Configuration.GetSection("JWT");
-
-if (jwtSettings == null)
-{
-    throw new Exception("JWT settings not found");
-}
-
-var secret = jwtSettings.GetValue<string>("SecretKey");
-
-if (string.IsNullOrEmpty(secret))
-{
-    throw new Exception("JWT settings not found");
-}
-
-
+var jwtSettings = builder.Configuration.GetSection("JWT");
 builder.Services.Configure<JwtSettings>(jwtSettings);
+
+var secret = jwtSettings.GetValue<string>("SecretKey")
+             ?? throw new Exception("JWT SecretKey not found");
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -51,6 +39,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddAuthorization();
 
 //Services
 builder.Services.AddScoped<UserService>();
@@ -66,9 +55,35 @@ builder.Services.AddControllers(options =>
 
 
 
+//Swagger
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Ingresa solo en token"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 //Mapper
 var mapperConfig = new MapperConfiguration(m =>
@@ -81,8 +96,12 @@ IMapper mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
 
+
+
 //Build App
 var app = builder.Build();
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -94,6 +113,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+//Authentication
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

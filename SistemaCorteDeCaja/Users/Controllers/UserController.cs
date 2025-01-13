@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SistemaCorteDeCaja.Models;
 using SistemaCorteDeCaja.Shared.DTOs.Responses;
@@ -10,6 +11,7 @@ namespace SistemaCorteDeCaja.Users.Controllers
 {
     [ApiController]
     [Route("api/user")]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly UserService _userservice;

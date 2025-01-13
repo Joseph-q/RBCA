@@ -11,19 +11,11 @@ using System.Text;
 
 namespace SistemaCorteDeCaja.Auth.Services
 {
-    public class AuthService
+    public class AuthService(CorteDeCajaContext context, IOptions<JwtSettings> jwtSettings)
     {
 
-        CorteDeCajaContext _context;
-        private readonly JwtSettings _jwtSettings;
-
-
-        public AuthService(CorteDeCajaContext context, IOptions<JwtSettings> jwtSettings)
-        {
-            _context = context;
-            _jwtSettings = jwtSettings.Value;
-        }
-
+        CorteDeCajaContext _context = context;
+        private readonly JwtSettings _jwtSettings = jwtSettings.Value;
 
         public async Task<User?> Login(LoginRequestData login)
         {
@@ -58,10 +50,10 @@ namespace SistemaCorteDeCaja.Auth.Services
         public string GenerateJwtToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
+            var key = Encoding.UTF8.GetBytes(_jwtSettings.SecretKey);
             var claims = new List<Claim>
             {
-                new Claim("sub", user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim("username", user.Username),
             };
 
