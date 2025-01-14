@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace SistemaCorteDeCaja.Models;
 
@@ -13,18 +15,36 @@ public partial class CorteDeCajaContext : DbContext
     {
     }
 
-    public virtual DbSet<Role> Roles { get; set; }
+    public virtual DbSet<Permission> Permissions { get; set; }
 
-    public virtual DbSet<RolePermission> RolePermissions { get; set; }
+    public virtual DbSet<Role> Roles { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=localhost,1433;Database=CorteDeCaja;User Id=sa;Password=TuPasswordFuerte2025!;TrustServerCertificate=True;");
+        => optionsBuilder.UseSqlServer("Server=localhost,1433;Database=CorteDeCaja;User Id=sa;Password=TuPasswordFuerte2025!;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Permission>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__permissi__3213E83F1C55E700");
+
+            entity.ToTable("permissions");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Action)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("action");
+            entity.Property(e => e.Condition).HasColumnName("condition");
+            entity.Property(e => e.Subject)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("subject");
+        });
+
         modelBuilder.Entity<Role>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__roles__3213E83FB8E6AB6D");
@@ -44,27 +64,25 @@ public partial class CorteDeCajaContext : DbContext
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasColumnName("name");
-        });
 
-        modelBuilder.Entity<RolePermission>(entity =>
-        {
-            entity.HasKey(e => new { e.RoleId, e.ObjectName }).HasName("PK__role_per__4728D6764079190C");
-
-            entity.ToTable("role_permissions");
-
-            entity.Property(e => e.RoleId).HasColumnName("role_id");
-            entity.Property(e => e.ObjectName)
-                .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasColumnName("object_name");
-            entity.Property(e => e.Permissions)
-                .HasMaxLength(4)
-                .HasColumnName("permissions");
-
-            entity.HasOne(d => d.Role).WithMany(p => p.RolePermissions)
-                .HasForeignKey(d => d.RoleId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_role_permissions_roles");
+            entity.HasMany(d => d.Permissions).WithMany(p => p.Roles)
+                .UsingEntity<Dictionary<string, object>>(
+                    "RolePermission",
+                    r => r.HasOne<Permission>().WithMany()
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK__role_perm__permi__05D8E0BE"),
+                    l => l.HasOne<Role>().WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK__role_perm__role___04E4BC85"),
+                    j =>
+                    {
+                        j.HasKey("RoleId", "PermissionId").HasName("PK__role_per__C85A5463A98F7421");
+                        j.ToTable("role_permissions");
+                        j.IndexerProperty<int>("RoleId").HasColumnName("role_id");
+                        j.IndexerProperty<int>("PermissionId").HasColumnName("permission_id");
+                    });
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -95,14 +113,14 @@ public partial class CorteDeCajaContext : DbContext
                     r => r.HasOne<Role>().WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK_user_roles_roles"),
+                        .HasConstraintName("FK__user_role__role___70DDC3D8"),
                     l => l.HasOne<User>().WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK_user_roles"),
+                        .HasConstraintName("FK__user_role__user___6FE99F9F"),
                     j =>
                     {
-                        j.HasKey("UserId", "RoleId").HasName("PK__user_rol__6EDEA1536BADA537");
+                        j.HasKey("UserId", "RoleId").HasName("PK__user_rol__6EDEA1532E3B49C1");
                         j.ToTable("user_roles");
                         j.IndexerProperty<int>("UserId").HasColumnName("user_id");
                         j.IndexerProperty<int>("RoleId").HasColumnName("role_id");

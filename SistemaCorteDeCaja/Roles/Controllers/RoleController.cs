@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SistemaCorteDeCaja.Models;
 using SistemaCorteDeCaja.Roles.Controllers.DTOs.Request;
@@ -10,6 +11,7 @@ namespace SistemaCorteDeCaja.Roles.Controllers
 {
     [ApiController]
     [Route("api/roles")]
+    [Authorize]
     public class RoleController(RoleService roleService, IMapper mapper) : ControllerBase
     {
         private readonly RoleService _roleService = roleService;

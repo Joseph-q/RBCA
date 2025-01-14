@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using SistemaCorteDeCaja.Shared.DTOs.Responses;
 using SistemaCorteDeCaja.Shared.Exeptions;
 
 namespace SistemaCorteDeCaja
@@ -24,10 +25,10 @@ namespace SistemaCorteDeCaja
                 }
 
 
-                context.Result = new ObjectResult(new
+                context.Result = new ObjectResult(new ErrorResponseDto()
                 {
-                    message = globalEx.Message,
-                    detail = globalEx.Detail
+                    Title = globalEx.Message,
+                    Detail = globalEx.Detail
                 })
                 {
                     StatusCode = (int)globalEx.StatusCode

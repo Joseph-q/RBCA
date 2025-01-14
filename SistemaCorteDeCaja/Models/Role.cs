@@ -1,4 +1,7 @@
-﻿namespace SistemaCorteDeCaja.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace SistemaCorteDeCaja.Models;
 
 public partial class Role
 {
@@ -10,7 +13,7 @@ public partial class Role
 
     public DateTime? CreatedAt { get; set; }
 
-    public virtual ICollection<RolePermission> RolePermissions { get; set; } = new List<RolePermission>();
+    public virtual ICollection<Permission> Permissions { get; set; } = new List<Permission>();
 
     public virtual ICollection<User> Users { get; set; } = new List<User>();
 }

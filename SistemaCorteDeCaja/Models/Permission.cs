@@ -3,15 +3,15 @@ using System.Collections.Generic;
 
 namespace SistemaCorteDeCaja.Models;
 
-public partial class User
+public partial class Permission
 {
     public int Id { get; set; }
 
-    public string Username { get; set; } = null!;
+    public string Action { get; set; } = null!;
 
-    public string PasswordHash { get; set; } = null!;
+    public string Subject { get; set; } = null!;
 
-    public DateTime? CreatedAt { get; set; }
+    public string? Condition { get; set; }
 
     public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
 }
