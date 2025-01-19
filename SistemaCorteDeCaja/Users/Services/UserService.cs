@@ -58,23 +58,41 @@ namespace SistemaCorteDeCaja.Users.Services
 
             if (roleId != null && roleId > 0)
             {
-                chain = chain.Where(user => user.Roles.Any(role => role.Id == queryParams.RoleId));
+                chain = chain.Where(u => u.Roles.Any(role => role.Id == queryParams.RoleId));
             }
 
-            return chain.Skip((page - 1) * limit).Take(limit).ToListAsync();
+            return chain.Skip((page - 1) * limit).Take(limit).Select(u => new User
+            {
+                Id = u.Id,
+                Username = u.Username,
+                CreatedAt = u.CreatedAt,
+            }).ToListAsync();
         }
 
 
         // Versión que acepta solo el 'id'
         public Task<User?> GetUserById(int id)
         {
-            return _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            return _context.Users
+                .Where(u => u.Id == id)
+                .Select(u => new User
+                {
+                    Id = u.Id,
+                    CreatedAt = u.CreatedAt,
+                    Username = u.Username,
+                })
+                .FirstOrDefaultAsync();
         }
 
         // Versión que acepta tanto el 'id' como 'queryParams'
         public Task<User?> GetUserById(int id, GetUserQueryParams queryParams)
         {
-            var chain = _context.Users.AsQueryable();
+            var chain = _context.Users.AsQueryable().Select(u => new User
+            {
+                Id = u.Id,
+                Username = u.Username,
+                CreatedAt = u.CreatedAt,
+            });
 
             int? roleLimit = queryParams.RoleLimit;
 

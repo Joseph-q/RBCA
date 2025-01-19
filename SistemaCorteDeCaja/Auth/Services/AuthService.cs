@@ -37,11 +37,23 @@ namespace SistemaCorteDeCaja.Auth.Services
         private Task<User?> GetUserWithPasswordAndRoles(string username)
         {
             return _context.Users
+                .Where(u => u.Username == username)
                 .Include(user => user.Roles)
-                .FirstOrDefaultAsync(user => user.Username == username);
+                .Select(u => new User
+                {
+                    Id = u.Id,
+                    Username = u.Username,
+                    PasswordHash = u.PasswordHash,
+                    Roles = u.Roles.Select(r => new Role
+                    {
+                        Id = r.Id,
+                        Name = r.Name
+                    }).ToList(),
+                })
+                .FirstOrDefaultAsync();
         }
 
-        private bool VerifyPassword(string password, string hashedPassword)
+        private static bool VerifyPassword(string password, string hashedPassword)
         {
             return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
         }
@@ -54,10 +66,9 @@ namespace SistemaCorteDeCaja.Auth.Services
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new Claim("username", user.Username),
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Role, user.Roles.FirstOrDefault()?.Name ?? "no role")
             };
-
-            claims.AddRange(user.Roles.Select(role => new Claim(ClaimTypes.Role, role.Name)));
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

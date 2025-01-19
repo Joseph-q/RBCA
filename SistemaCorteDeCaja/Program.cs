@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SistemaCorteDeCaja;
 using SistemaCorteDeCaja.Auth.Services;
+using SistemaCorteDeCaja.Authorization.Services;
 using SistemaCorteDeCaja.Models;
 using SistemaCorteDeCaja.Roles.Services;
 using SistemaCorteDeCaja.Shared.Settings;
@@ -45,6 +46,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<AuthorizationService>();
+
 
 // Add services to the container.
 builder.Services.AddControllers(options =>
@@ -52,12 +55,12 @@ builder.Services.AddControllers(options =>
     //Handling Errors
     options.Filters.Add<ExceptionHandlingFilter>();
 });
+builder.Services.AddEndpointsApiExplorer();
 
 
 
 //Swagger
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SistemaCorteDeCaja.Authorization.Atributtes;
+using SistemaCorteDeCaja.Authorization.Constants;
 using SistemaCorteDeCaja.Models;
 using SistemaCorteDeCaja.Shared.DTOs.Responses;
 using SistemaCorteDeCaja.Users.Controllers.DTOs.Request;
@@ -12,6 +14,7 @@ namespace SistemaCorteDeCaja.Users.Controllers
     [ApiController]
     [Route("api/user")]
     [Authorize]
+    [CustomAuthorizeAttribute]
     public class UserController : ControllerBase
     {
         private readonly UserService _userservice;
@@ -24,6 +27,7 @@ namespace SistemaCorteDeCaja.Users.Controllers
         }
 
         [HttpGet]
+        [PermissionPolicy(DefaultActions.Read, DefaultSubjects.Users)]
         public async Task<IActionResult> GetUsers([FromQuery] GetUsersQueryParams queryParams)
         {
             List<User> users = await _userservice.GetUsers(queryParams);
@@ -35,6 +39,7 @@ namespace SistemaCorteDeCaja.Users.Controllers
         }
 
         [HttpGet("{id}")]
+        [PermissionPolicy(DefaultActions.Read, DefaultSubjects.Users)]
         public async Task<IActionResult> GetUser(int id, [FromQuery] GetUserQueryParams queryParams)
         {
             User? user = await _userservice.GetUserById(id, queryParams);
@@ -54,6 +59,7 @@ namespace SistemaCorteDeCaja.Users.Controllers
         }
 
         [HttpPost]
+        [PermissionPolicy(DefaultActions.Create, DefaultSubjects.Users)]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest user)
         {
             await _userservice.CreateUser(user);
@@ -61,6 +67,7 @@ namespace SistemaCorteDeCaja.Users.Controllers
         }
 
         [HttpPut("{id}")]
+        [PermissionPolicy(DefaultActions.Update, DefaultSubjects.Users)]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserRequest userToUpdate)
         {
             User? userDb = await _userservice.GetUserById(id);
@@ -75,6 +82,7 @@ namespace SistemaCorteDeCaja.Users.Controllers
         }
 
         [HttpDelete("{id}")]
+        [PermissionPolicy(DefaultActions.Delete, DefaultSubjects.Users)]
         public async Task<IActionResult> DeleteUser(int id)
         {
             User? user = await _userservice.GetUserById(id);
