@@ -38,7 +38,9 @@ namespace SistemaCorteDeCaja.Roles.Services
         {
             int page = queryParams.Page;
             int limit = queryParams.Limit;
-            return _context.Roles.Skip((page - 1)).Take(limit).ToListAsync();
+            return _context.Roles.Skip((page - 1)).Take(limit)
+                .OrderBy(r => r.Name)
+                .ToListAsync();
         }
 
         public Task<int> UpdateRole(Role roleDb, UpdateRoleRequest roleToUpdate)

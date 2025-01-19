@@ -47,19 +47,22 @@ namespace SistemaCorteDeCaja.Users.Services
             int page = queryParams.Page;
             int limit = queryParams.Limit;
             int? roleId = queryParams.RoleId;
-            var chain = _context.Users.AsQueryable();
+            var chain = _context.Users.AsQueryable()
+                .Select(u => new User
+                {
+                    Id = u.Id,
+                    Username = u.Username,
+                    CreatedAt = u.CreatedAt,
+                });
 
             if (roleId != null && roleId > 0)
             {
                 chain = chain.Where(u => u.Roles.Any(role => role.Id == queryParams.RoleId));
             }
 
-            return chain.Skip((page - 1) * limit).Take(limit).Select(u => new User
-            {
-                Id = u.Id,
-                Username = u.Username,
-                CreatedAt = u.CreatedAt,
-            }).ToListAsync();
+            return chain.Skip((page - 1) * limit).Take(limit)
+                .OrderBy(u => u.CreatedAt)
+                .ToListAsync();
         }
 
 

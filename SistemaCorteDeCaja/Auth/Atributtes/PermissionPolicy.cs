@@ -1,4 +1,4 @@
-﻿namespace SistemaCorteDeCaja.Authorization.Atributtes
+﻿namespace SistemaCorteDeCaja.Auth.Atributtes
 {
     [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
     public class PermissionPolicy(string action, string subject) : Attribute

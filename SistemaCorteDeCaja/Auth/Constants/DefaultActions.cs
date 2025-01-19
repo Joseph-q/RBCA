@@ -1,4 +1,4 @@
-﻿namespace SistemaCorteDeCaja.Authorization.Constants
+﻿namespace SistemaCorteDeCaja.Auth.Constants
 {
     public class DefaultActions
     {

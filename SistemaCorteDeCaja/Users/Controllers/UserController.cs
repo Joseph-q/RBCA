@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SistemaCorteDeCaja.Authorization.Atributtes;
-using SistemaCorteDeCaja.Authorization.Constants;
+using SistemaCorteDeCaja.Auth.Atributtes;
+using SistemaCorteDeCaja.Auth.Constants;
 using SistemaCorteDeCaja.Models;
 using SistemaCorteDeCaja.Shared.DTOs.Responses;
 using SistemaCorteDeCaja.Users.Controllers.DTOs.Request;

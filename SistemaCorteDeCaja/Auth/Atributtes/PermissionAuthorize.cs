@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
-using SistemaCorteDeCaja.Authorization.Services;
+using SistemaCorteDeCaja.Auth.Services;
 using System.Reflection;
 using System.Security.Claims;
 
 
-namespace SistemaCorteDeCaja.Authorization.Atributtes
+namespace SistemaCorteDeCaja.Auth.Atributtes
 {
     public class PermissionAuthorize : TypeFilterAttribute
     {
@@ -16,15 +16,15 @@ namespace SistemaCorteDeCaja.Authorization.Atributtes
 
         }
 
-        private class PermissionValidationFilter(AuthorizationService authenticationService) : IAsyncAuthorizationFilter
+        private class PermissionValidationFilter(AuthService authenticationService) : IAsyncAuthorizationFilter
         {
-            private readonly AuthorizationService _authenticationService = authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
+            private readonly AuthService _authService = authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
 
             public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
             {
                 var user = context.HttpContext.User;
 
-                if ((user == null) || (!user.Identity?.IsAuthenticated ?? false))
+                if (user == null || (!user.Identity?.IsAuthenticated ?? false))
                 {
                     context.Result = new ForbidResult();
                     return;
@@ -55,7 +55,7 @@ namespace SistemaCorteDeCaja.Authorization.Atributtes
                         return;
                     }
 
-                    bool hasPermission = await _authenticationService.CheckUserPermissionAsync(
+                    bool hasPermission = await _authService.CheckUserPermissionAsync(
                         userId,
                         userRole,
                         permissionPolicy.Action,

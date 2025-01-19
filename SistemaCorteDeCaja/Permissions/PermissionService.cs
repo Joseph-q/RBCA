@@ -24,6 +24,7 @@ namespace SistemaCorteDeCaja.Permissions
 
             return chain
                 .Skip((page - 1)).Take(limit)
+                .OrderBy(p => p.Subject)
                 .ToListAsync();
         }
     }
