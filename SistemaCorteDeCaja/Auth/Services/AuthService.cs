@@ -84,32 +84,19 @@ namespace SistemaCorteDeCaja.Auth.Services
         public async Task<bool> CheckUserPermissionAsync(int userId, string roleName, string action, string subject)
         {
             User? user = await GetUserWithRole(userId, roleName);
-            if (user == null || user.Roles.Count == 0) // Verifica si el usuario tiene roles
-            {
-                return false;
-            }
+            if (user == null) return false; // If user does not have that role is not valid
 
-            // Obtener permisos de todos los roles del usuario
-            var permissions = new List<Permission>();
-            foreach (var role in user.Roles)
-            {
-                var rolePermissions = await GetPermissionByRoleId(role.Id);
-                permissions.AddRange(rolePermissions);
-            }
+            var userRole = user.Roles.FirstOrDefault();
+            if (userRole == null) return false; // If user does not have a role is not valid
+            if (userRole.Name == "admin") return true; // Admin has all permissions
 
-            // Verificar si alguno de los permisos coincide con la acción y el sujeto
+            List<Permission> permissions = await GetPermissionByRoleId(userRole.Id); // Get Permission for that role
+
             foreach (var permission in permissions)
             {
-                if (permission.Action == action && permission.Subject == subject)
-                {
-                    return true;
-                }
+                if (permission.Action == "manage" && permission.Subject == "all") return true; // manage all is for all subjects and actions
 
-                // Permiso de "manage" para "all" otorga acceso
-                if (permission.Action == "manage" && permission.Subject == "all")
-                {
-                    return true;
-                }
+                if (permission.Action == action && permission.Subject == subject) return true; // If actions and subjects match with permissions form the user return true
             }
 
             return false;
