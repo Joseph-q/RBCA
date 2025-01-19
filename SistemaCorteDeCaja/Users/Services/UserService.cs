@@ -8,17 +8,10 @@ using SistemaCorteDeCaja.Users.Exeptions;
 
 namespace SistemaCorteDeCaja.Users.Services
 {
-    public class UserService
+    public class UserService(CorteDeCajaContext context, IMapper mapper)
     {
-        private readonly IMapper _mapper;
-        private readonly CorteDeCajaContext _context;
-
-        public UserService(CorteDeCajaContext context, IMapper mapper)
-        {
-            _context = context;
-            _mapper = mapper;
-        }
-
+        private readonly IMapper _mapper = mapper;
+        private readonly CorteDeCajaContext _context = context;
 
         public async Task CreateUser(CreateUserRequest user)
         {

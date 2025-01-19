@@ -14,17 +14,11 @@ namespace SistemaCorteDeCaja.Users.Controllers
     [ApiController]
     [Route("api/user")]
     [Authorize]
-    [CustomAuthorizeAttribute]
-    public class UserController : ControllerBase
+    [PermissionAuthorize]
+    public class UserController(UserService uservice, IMapper mapper) : ControllerBase
     {
-        private readonly UserService _userservice;
-        private readonly IMapper _mapper;
-
-        public UserController(UserService uservice, IMapper mapper)
-        {
-            _userservice = uservice;
-            _mapper = mapper;
-        }
+        private readonly UserService _userservice = uservice;
+        private readonly IMapper _mapper = mapper;
 
         [HttpGet]
         [PermissionPolicy(DefaultActions.Read, DefaultSubjects.Users)]

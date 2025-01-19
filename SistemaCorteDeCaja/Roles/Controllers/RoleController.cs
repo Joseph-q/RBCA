@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SistemaCorteDeCaja.Authorization.Atributtes;
+using SistemaCorteDeCaja.Authorization.Constants;
 using SistemaCorteDeCaja.Models;
 using SistemaCorteDeCaja.Roles.Controllers.DTOs.Request;
 using SistemaCorteDeCaja.Roles.Controllers.DTOs.Response;
@@ -12,12 +14,14 @@ namespace SistemaCorteDeCaja.Roles.Controllers
     [ApiController]
     [Route("api/roles")]
     [Authorize]
+    [PermissionAuthorize]
     public class RoleController(RoleService roleService, IMapper mapper) : ControllerBase
     {
         private readonly RoleService _roleService = roleService;
         private readonly IMapper _mapper = mapper;
 
         [HttpGet]
+        [PermissionPolicy(DefaultActions.Read, DefaultSubjects.Roles)]
         public async Task<IActionResult> GetRoles([FromQuery] GetRolesQueryParams queryParams)
         {
             List<Role> roles = await _roleService.GetRoles(queryParams);
@@ -30,6 +34,7 @@ namespace SistemaCorteDeCaja.Roles.Controllers
         }
 
         [HttpGet("{id}")]
+        [PermissionPolicy(DefaultActions.Read, DefaultSubjects.Roles)]
         public async Task<IActionResult> GetRole(int id)
         {
             Role? role = await _roleService.GetRoleById(id);
@@ -50,6 +55,7 @@ namespace SistemaCorteDeCaja.Roles.Controllers
 
 
         [HttpPost]
+        [PermissionPolicy(DefaultActions.Create, DefaultSubjects.Roles)]
         public async Task<IActionResult> CreateRole([FromBody] CreateRoleRequest roleToCreate)
         {
             Role role = _mapper.Map<Role>(roleToCreate);
@@ -60,6 +66,7 @@ namespace SistemaCorteDeCaja.Roles.Controllers
         }
 
         [HttpPut("{id}")]
+        [PermissionPolicy(DefaultActions.Update, DefaultSubjects.Roles)]
         public async Task<IActionResult> UpdateRole(int id, [FromBody] UpdateRoleRequest roleToUpdate)
         {
             Role? role = await _roleService.GetRoleById(id);
@@ -86,6 +93,7 @@ namespace SistemaCorteDeCaja.Roles.Controllers
 
 
         [HttpDelete("{id}")]
+        [PermissionPolicy(DefaultActions.Delete, DefaultSubjects.Roles)]
         public async Task<IActionResult> DeleteRole(int id)
         {
             Role? role = await _roleService.GetRoleById(id);
@@ -107,6 +115,27 @@ namespace SistemaCorteDeCaja.Roles.Controllers
             };
 
 
+            return Ok(response);
+        }
+
+        [HttpPost("{id}/permissions")]
+        [PermissionPolicy(DefaultActions.Update, DefaultSubjects.Roles)]
+        public async Task<IActionResult> AddPermissionsToRole(int id, [FromBody] AddPermissionToRoleRequest permissionRequest)
+        {
+            Role? role = await _roleService.GetRoleById(id);
+            IResponse response;
+            if (role == null)
+            {
+                response = new ErrorResponseDto { Title = "Role Not Found" };
+                return NotFound(response);
+            }
+
+            int affectedRows = await _roleService.AddPermissionsToRole(role, permissionRequest.permissionsId);
+
+            response = new SuccessResponseDto
+            {
+                Data = new { affectedRows }
+            };
             return Ok(response);
         }
 

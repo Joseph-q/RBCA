@@ -3,14 +3,9 @@ using SistemaCorteDeCaja.Models;
 
 namespace SistemaCorteDeCaja.Authorization.Services
 {
-    public class AuthorizationService
+    public class AuthorizationService(CorteDeCajaContext context)
     {
-        private readonly CorteDeCajaContext _context;
-
-        public AuthorizationService(CorteDeCajaContext context)
-        {
-            _context = context;
-        }
+        private readonly CorteDeCajaContext _context = context;
 
         private Task<User?> GetUserWithRole(int userId, string rolename)
         {

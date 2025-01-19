@@ -7,16 +7,10 @@ using SistemaCorteDeCaja.Roles.Exeptions;
 
 namespace SistemaCorteDeCaja.Roles.Services
 {
-    public class RoleService
+    public class RoleService(CorteDeCajaContext contex, IMapper mapper)
     {
-        private readonly CorteDeCajaContext _context;
-        private readonly IMapper _mapper;
-
-        public RoleService(CorteDeCajaContext contex, IMapper mapper)
-        {
-            _context = contex;
-            _mapper = mapper;
-        }
+        private readonly CorteDeCajaContext _context = contex;
+        private readonly IMapper _mapper = mapper;
 
         public async Task CreateRole(Role role)
         {
@@ -68,6 +62,14 @@ namespace SistemaCorteDeCaja.Roles.Services
         public Task<int> DeleteRole(Role roleDb)
         {
             _context.Remove(roleDb);
+
+            return _context.SaveChangesAsync();
+        }
+
+
+        public Task<int> AddPermissionsToRole(Role role, List<int> permissionsIds)
+        {
+            role.Permissions.Add((Permission)permissionsIds.Select(id => new Permission { Id = id }));
 
             return _context.SaveChangesAsync();
         }

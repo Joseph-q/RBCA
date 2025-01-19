@@ -6,7 +6,7 @@ using SistemaCorteDeCaja.Models;
 namespace SistemaCorteDeCaja.Auth.Controller
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     public class AuthController(AuthService authservice) : ControllerBase
     {
         private readonly AuthService _authservice = authservice;

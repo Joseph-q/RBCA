@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using SistemaCorteDeCaja.Models;
+using SistemaCorteDeCaja.Permissions.DTOs.Response;
 using SistemaCorteDeCaja.Roles.Controllers.DTOs.Request;
 using SistemaCorteDeCaja.Roles.Controllers.DTOs.Response;
 using SistemaCorteDeCaja.Users.Controllers.DTOs.Request;
@@ -40,6 +41,10 @@ namespace SistemaCorteDeCaja
                 .ForMember(d => d.Description, o => o.MapFrom((s, d) => s.Description ?? d.Description));
 
             CreateMap<Role, RoleDto>();
+
+
+            //Permission Mapping
+            CreateMap<Permission, PermissionDto>();
         }
     }
 }

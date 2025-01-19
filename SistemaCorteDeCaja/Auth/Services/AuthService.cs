@@ -14,7 +14,7 @@ namespace SistemaCorteDeCaja.Auth.Services
     public class AuthService(CorteDeCajaContext context, IOptions<JwtSettings> jwtSettings)
     {
 
-        CorteDeCajaContext _context = context;
+        private readonly CorteDeCajaContext _context = context;
         private readonly JwtSettings _jwtSettings = jwtSettings.Value;
 
         public async Task<User?> Login(LoginRequestData login)
