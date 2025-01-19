@@ -5,7 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SistemaCorteDeCaja;
 using SistemaCorteDeCaja.Auth.Services;
-using SistemaCorteDeCaja.Authorization.Services;
 using SistemaCorteDeCaja.Models;
 using SistemaCorteDeCaja.Permissions;
 using SistemaCorteDeCaja.Roles.Services;
@@ -47,7 +46,6 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<AuthorizationService>();
 builder.Services.AddScoped<PermissionService>();
 
 
