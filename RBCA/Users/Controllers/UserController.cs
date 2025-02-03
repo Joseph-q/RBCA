@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RBCA.Users.Controllers.DTOs.Responses;
 using SistemaCorteDeCaja.Auth.Atributtes;
 using SistemaCorteDeCaja.Auth.Constants;
 using SistemaCorteDeCaja.Models;
@@ -11,17 +12,23 @@ using SistemaCorteDeCaja.Users.Services;
 
 namespace SistemaCorteDeCaja.Users.Controllers
 {
-    [ApiController]
-    [Route("api/user")]
+
     [Authorize]
     [PermissionAuthorize]
+    [ApiController]
+    [Route("api/user")]
+    [Produces("application/json")]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(404, Type = typeof(ErrorResponseDto))]
     public class UserController(UserService uservice, IMapper mapper) : ControllerBase
     {
         private readonly UserService _userservice = uservice;
         private readonly IMapper _mapper = mapper;
 
+
         [HttpGet]
         [PermissionPolicy(DefaultActions.Read, DefaultSubjects.Users)]
+        [ProducesResponseType(200, Type = typeof(SuccessResponseDto<List<UserWithoutRolesDTO>>))]
         public async Task<IActionResult> GetUsers([FromQuery] GetUsersQueryParams queryParams)
         {
             List<User> users = await _userservice.GetUsers(queryParams);
@@ -31,7 +38,7 @@ namespace SistemaCorteDeCaja.Users.Controllers
 
             return Ok(response);
         }
-
+        [ProducesResponseType(200, Type = typeof(SuccessResponseDto<UserDTO>))]
         [HttpGet("{id}")]
         [PermissionPolicy(DefaultActions.Read, DefaultSubjects.Users)]
         public async Task<IActionResult> GetUser(int id, [FromQuery] GetUserQueryParams queryParams)
@@ -52,6 +59,7 @@ namespace SistemaCorteDeCaja.Users.Controllers
             return Ok(response);
         }
 
+        [ProducesResponseType(201)]
         [HttpPost]
         [PermissionPolicy(DefaultActions.Create, DefaultSubjects.Users)]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest user)
@@ -60,6 +68,7 @@ namespace SistemaCorteDeCaja.Users.Controllers
             return Created();
         }
 
+        [ProducesResponseType(204)]
         [HttpPut("{id}")]
         [PermissionPolicy(DefaultActions.Update, DefaultSubjects.Users)]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserRequest userToUpdate)
@@ -75,6 +84,7 @@ namespace SistemaCorteDeCaja.Users.Controllers
             return NoContent();
         }
 
+        [ProducesResponseType(204)]
         [HttpDelete("{id}")]
         [PermissionPolicy(DefaultActions.Delete, DefaultSubjects.Users)]
         public async Task<IActionResult> DeleteUser(int id)

@@ -1,13 +1,17 @@
 ﻿namespace SistemaCorteDeCaja.Shared.DTOs.Responses
 {
-    public interface ISuccessResponse : IResponse
+    public interface ISuccessResponse<T> : IResponse
     {
-        object? Data { get; set; }
+        T Data { get; set; }
     }
 
-    public class SuccessResponseDto : ISuccessResponse
+    public class SuccessResponseDto<T> : ISuccessResponse<T>
     {
         public string Title { get; set; } = "Success";
-        public object? Data { get; set; }
+        public T Data { get; set; } = default!;
+    }
+
+    public class SuccessResponseDto : SuccessResponseDto<object>
+    {
     }
 }

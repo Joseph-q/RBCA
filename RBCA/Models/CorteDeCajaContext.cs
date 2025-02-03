@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace SistemaCorteDeCaja.Models;
-
+#pragma warning disable CS1591
 public partial class CorteDeCajaContext : DbContext
 {
     public CorteDeCajaContext()
@@ -132,3 +130,5 @@ public partial class CorteDeCajaContext : DbContext
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
+#pragma warning restore CS1591
+

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RBCA.Shared.DTOs.Responses;
 using SistemaCorteDeCaja.Auth.Atributtes;
 using SistemaCorteDeCaja.Auth.Constants;
 using SistemaCorteDeCaja.Models;
@@ -13,6 +14,9 @@ namespace SistemaCorteDeCaja.Roles.Controllers
 {
     [ApiController]
     [Route("api/roles")]
+    [Produces("application/json")]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(404, Type = typeof(ErrorResponseDto))]
     [Authorize]
     [PermissionAuthorize]
     public class RoleController(RoleService roleService, IMapper mapper) : ControllerBase
@@ -21,6 +25,7 @@ namespace SistemaCorteDeCaja.Roles.Controllers
         private readonly IMapper _mapper = mapper;
 
         [HttpGet]
+        [ProducesResponseType(200, Type = typeof(SuccessResponseDto<List<RoleDto>>))]
         [PermissionPolicy(DefaultActions.Read, DefaultSubjects.Roles)]
         public async Task<IActionResult> GetRoles([FromQuery] GetRolesQueryParams queryParams)
         {
@@ -34,6 +39,7 @@ namespace SistemaCorteDeCaja.Roles.Controllers
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(200, Type = typeof(SuccessResponseDto<RoleDto>))]
         [PermissionPolicy(DefaultActions.Read, DefaultSubjects.Roles)]
         public async Task<IActionResult> GetRole(int id)
         {
@@ -54,6 +60,7 @@ namespace SistemaCorteDeCaja.Roles.Controllers
         }
 
 
+        [ProducesResponseType(201)]
         [HttpPost]
         [PermissionPolicy(DefaultActions.Create, DefaultSubjects.Roles)]
         public async Task<IActionResult> CreateRole([FromBody] CreateRoleRequest roleToCreate)
@@ -65,6 +72,7 @@ namespace SistemaCorteDeCaja.Roles.Controllers
             return Created();
         }
 
+        [ProducesResponseType(201, Type = typeof(SuccessResponseDto<RowsAffectedDTO>))]
         [HttpPut("{id}")]
         [PermissionPolicy(DefaultActions.Update, DefaultSubjects.Roles)]
         public async Task<IActionResult> UpdateRole(int id, [FromBody] UpdateRoleRequest roleToUpdate)
@@ -91,7 +99,7 @@ namespace SistemaCorteDeCaja.Roles.Controllers
             return Ok(response);
         }
 
-
+        [ProducesResponseType(201, Type = typeof(SuccessResponseDto<RowsAffectedDTO>))]
         [HttpDelete("{id}")]
         [PermissionPolicy(DefaultActions.Delete, DefaultSubjects.Roles)]
         public async Task<IActionResult> DeleteRole(int id)
@@ -118,7 +126,9 @@ namespace SistemaCorteDeCaja.Roles.Controllers
             return Ok(response);
         }
 
+        /// <response code="201">Add permitions to role, if you add many roles affeted rows will be 1</response>
         [HttpPost("{id}/permissions")]
+        [ProducesResponseType(201, Type = typeof(SuccessResponseDto<RowsAffectedDTO>))]
         [PermissionPolicy(DefaultActions.Update, DefaultSubjects.Roles)]
         public async Task<IActionResult> AddPermissionsToRole(int id, [FromBody] AddPermissionToRoleRequest permissionRequest)
         {

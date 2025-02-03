@@ -10,6 +10,7 @@ using SistemaCorteDeCaja.Permissions;
 using SistemaCorteDeCaja.Roles.Services;
 using SistemaCorteDeCaja.Shared.Settings;
 using SistemaCorteDeCaja.Users.Services;
+using System.Reflection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,11 +56,11 @@ builder.Services.AddControllers(options =>
     //Handling Errors
     options.Filters.Add<ExceptionHandlingFilter>();
 });
-builder.Services.AddEndpointsApiExplorer();
 
 
 
 //Swagger
+builder.Services.AddEndpointsApiExplorer();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddSwaggerGen(c =>
 {
@@ -86,6 +87,9 @@ builder.Services.AddSwaggerGen(c =>
             Array.Empty<string>()
         }
     });
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
 });
 
 //Mapper
