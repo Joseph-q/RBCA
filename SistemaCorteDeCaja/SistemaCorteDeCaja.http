@@ -1,6 +1,0 @@
-@SistemaCorteDeCaja_HostAddress = http://localhost:5244
-
-GET {{SistemaCorteDeCaja_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
